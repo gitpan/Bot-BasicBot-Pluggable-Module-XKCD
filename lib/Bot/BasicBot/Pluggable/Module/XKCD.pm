@@ -14,11 +14,11 @@ Bot::BasicBot::Pluggable::Module::XKCD - Get xkcd comic links and titles
 
 =head1 VERSION
 
-Version 0.01
+Version 0.06
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS
@@ -56,9 +56,19 @@ sub told {
 	} elsif ($param =~ /^\d+$/) {
 	    $url = "http://xkcd.com/$param/";
 	} else {
-	    local $_ = get "http://xkcd.com/archive/";
-	    my @links = m{href="/(\d+)/".*$param}i;
-	    $url = "http://xkcd.com/$1/" if @links;
+	    my $num = eval { # just in case someone gives us some horrific RE
+		local $_ = get "http://xkcd.com/archive/";
+		local $SIG{ALRM} = sub { die "timed out\n" };
+		alarm 10; # XXX: \o/ magic numbers
+		m{href="/(\d+)/".*$param}i;
+		alarm 0;
+		return $1;
+	    };
+	    if ($@) {
+		die unless $@ eq "timed out\n";
+		return "Timed out.";
+	    }
+	    $url = "http://xkcd.com/$num/" if $num;
 	}
 
 	my $title = title($url);

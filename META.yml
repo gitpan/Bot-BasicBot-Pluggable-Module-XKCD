@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Bot-BasicBot-Pluggable-Module-XKCD
-version:            0.01
+version:            0.06
 abstract:           Get xkcd comic links and titles
 author:
     - Josh Holland <jrh@joshh.co.uk>
